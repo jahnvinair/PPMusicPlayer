@@ -141,6 +141,61 @@ public:
         }
         return shuffledIndices[0];
     }
+
+    void managePlaylistMenu(vector<Playlist>& playlists, int& currentPlaylist) {
+        int choice;
+
+        while (true) {
+            cout << "\nManage Playlist Menu:" << endl;
+            cout << "1. Add Song to Playlist" << endl;
+            cout << "2. Display Playlist" << endl;
+            cout << "3. Select a Playlist" << endl;
+            cout << "4. Delete Playlist" << endl;
+            cout << "5. Back to Main Menu" << endl;
+
+            cout << "Enter your choice: ";
+            if (!(cin >> choice)) {
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cout << "Invalid choice. Please try again." << endl;
+                continue;
+            }
+
+            if (choice == 1) {
+                string songTitle, artistName;
+                cout << "Enter the title of the song: ";
+                cin.ignore();
+                getline(cin, songTitle);
+                cout << "Enter the artist's name: ";
+                getline(cin, artistName);
+                Media* newSong = new Song(songTitle, artistName);
+                addMedia(newSong);
+                cout << "Song added to the playlist." << endl;
+            } else if (choice == 2) {
+                displayPlaylist();
+            } else if (choice == 3) {
+                cout << "Select a playlist (1-" << playlists.size() << "): ";
+                int newCurrentPlaylist;
+                if (!(cin >> newCurrentPlaylist) || newCurrentPlaylist < 1 || newCurrentPlaylist > playlists.size()) {
+                    cout << "Invalid playlist selection." << endl;
+                } else {
+                    currentPlaylist = newCurrentPlaylist;
+                }
+            } else if (choice == 4) {
+                if (currentPlaylist != -1) {
+                    playlists.erase(playlists.begin() + currentPlaylist - 1);
+                    currentPlaylist = -1;
+                    cout << "Playlist deleted." << endl;
+                } else {
+                    cout << "No playlist is currently selected." << endl;
+                }
+            } else if (choice == 5) {
+                return; // Return to the Main Menu
+            } else {
+                cout << "Invalid choice. Please try again." << endl;
+            }
+        }
+    }
 };
 
 int main() {
@@ -165,7 +220,7 @@ int main() {
         cout << "7. Manage Playlists" << endl;
 
         if (currentPlaylist != -1) {
-                cout << "8. Delete Playlist" << endl;
+                cout << "8. Manage Playlist" << endl;
         }
 
         cout << "9. Exit" << endl;
@@ -227,11 +282,9 @@ int main() {
             }
         } else if (choice == 8) {
             if (currentPlaylist != -1) {
-                playlists.erase(playlists.begin() + currentPlaylist - 1);
-                currentPlaylist = -1;
-                cout << "Playlist deleted." << endl;
+                playlists[currentPlaylist - 1].managePlaylistMenu(playlists, currentPlaylist);
             } else {
-                cout << "No playlist is currently selected." << endl;
+                cout << "Please select a playlist first." << endl;
             }
         } else if (choice == 9) {
             cout << "Thank you for using the Music Player. Goodbye!" << endl;
